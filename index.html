@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>내 수업 앱 모음</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --bg:#f6f3ec; --card:#fffdf8; --ink:#2b2a27; --sub:#6f6a60; --line:#e4ddcf;
+  --accent:#2f6f5e; --accent-ink:#fff; --soft:#e8f1ec; --warn:#b5651d; --warn-soft:#fbeee0;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1c1d1b; --card:#262825; --ink:#ecebe6; --sub:#a7a399; --line:#3a3c37;
+    --accent:#7cc4ad; --accent-ink:#13201b; --soft:#2c3a34; --warn:#e8a46a; --warn-soft:#3a2e22;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1c1d1b; --card:#262825; --ink:#ecebe6; --sub:#a7a399; --line:#3a3c37;
+  --accent:#7cc4ad; --accent-ink:#13201b; --soft:#2c3a34; --warn:#e8a46a; --warn-soft:#3a2e22;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans KR",system-ui,sans-serif;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 16px 60px}
+header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px;margin-bottom:22px}
+h1{font-family:"Gowun Dodum",sans-serif;font-size:clamp(26px,4vw,36px);margin:0}
+.today{color:var(--sub);font-size:15px}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+button,.btn{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);
+  padding:8px 14px;border-radius:10px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+button:hover,.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.chip{border-radius:999px;padding:6px 14px}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;position:relative}
+.card.pinned{border-color:var(--accent);box-shadow:0 0 0 2px var(--soft)}
+.top{display:flex;gap:12px;align-items:center}
+.icon{font-size:30px;width:52px;height:52px;border-radius:14px;background:var(--soft);display:grid;place-items:center;flex:none}
+.name{font-weight:800;font-size:18px;margin:0}
+.tag{font-size:12px;color:var(--sub)}
+.desc{color:var(--sub);font-size:14px;margin:0;flex:1}
+.status{font-size:12px;color:var(--warn);background:var(--warn-soft);padding:2px 8px;border-radius:6px;align-self:flex-start}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions .btn{flex:1;justify-content:center}
+.edit-row{display:none;gap:6px;justify-content:flex-end}
+body.editing .edit-row{display:flex}
+body.editing .card{border-style:dashed}
+.edit-row button{padding:4px 10px;font-size:13px}
+.pin{position:absolute;top:12px;right:14px;font-size:16px;opacity:.9}
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);padding:22px;width:min(520px,calc(100vw - 32px))}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h2{margin:0 0 14px;font-size:20px}
+label{display:block;font-size:13px;color:var(--sub);margin:10px 0 4px}
+input,textarea,select{width:100%;font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.row2{display:grid;grid-template-columns:90px 1fr;gap:10px}
+.dlg-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+#qrBox{display:grid;place-items:center;padding:16px;background:#fff;border-radius:12px;margin:10px 0}
+#qrUrl{font-size:13px;color:var(--sub);word-break:break-all;text-align:center}
+.qr-dlg{text-align:center;width:min(440px,calc(100vw - 32px))}
+.hint{font-size:13px;color:var(--sub);margin-top:24px}
+.local-note{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:14px;background:var(--warn-soft);color:var(--ink);
+  border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:16px}
+.local-note[hidden]{display:none}
+.local-note button{padding:4px 10px;font-size:13px}
+@media (max-width:520px){.row2{grid-template-columns:70px 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>내 수업 앱 모음</h1>
+      <div class="today" id="today"></div>
+    </div>
+    <div class="tools">
+      <button id="addBtn" class="btn">＋ 앱 추가</button>
+      <button id="editBtn" class="btn">✏️ 편집</button>
+      <button id="moreBtn" class="btn">⋯ 백업</button>
+    </div>
+  </header>
+
+  <div class="local-note" id="localNote" hidden>
+    ✏️ 이 브라우저에서만 고친 목록을 보고 있어요. 다른 컴퓨터에는 반영되지 않아요.
+    <button id="toOfficial">공식 목록으로 보기</button>
+  </div>
+  <div class="filters" id="filters"></div>
+  <div class="grid" id="grid"></div>
+
+  <p class="hint">📌 고정한 앱은 맨 앞에 보여요. 여기서 편집한 내용은 이 브라우저에만 저장돼요. 모든 컴퓨터에 반영하려면 apps.json을 고쳐서 GitHub에 올리면 돼요.</p>
+</div>
+
+<!-- 앱 추가/수정 -->
+<dialog id="appDlg">
+  <form method="dialog" id="appForm">
+    <h2 id="appDlgTitle">앱 추가</h2>
+    <div class="row2">
+      <div><label>아이콘</label><input name="icon" maxlength="4" placeholder="📘"></div>
+      <div><label>앱 이름 *</label><input name="name" required></div>
+    </div>
+    <label>분류</label>
+    <input name="cat" list="catList" placeholder="수업 활동">
+    <datalist id="catList"></datalist>
+    <label>설명</label>
+    <textarea name="desc" rows="2"></textarea>
+    <label>교사용 주소</label>
+    <input name="teacher" type="url" placeholder="https://...">
+    <label>학생용 주소 (QR로 보여줄 주소)</label>
+    <input name="student" type="url" placeholder="https://...">
+    <label>메모 (예: 배포 안 됨, 로컬 실행)</label>
+    <input name="note">
+    <div class="dlg-actions">
+      <button value="cancel" formnovalidate>취소</button>
+      <button value="ok" class="btn primary">저장</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- QR -->
+<dialog id="qrDlg" class="qr-dlg">
+  <h2 id="qrTitle"></h2>
+  <div id="qrBox"></div>
+  <div id="qrUrl"></div>
+  <div class="dlg-actions" style="justify-content:center">
+    <button id="copyBtn">주소 복사</button>
+    <button onclick="qrDlg.close()" class="btn primary">닫기</button>
+  </div>
+</dialog>
+
+<!-- 백업 -->
+<dialog id="moreDlg">
+  <h2>백업 · 복원</h2>
+  <p class="desc">앱 목록을 파일로 내보내거나, 내보낸 파일을 불러와요.</p>
+  <div class="actions" style="margin-top:12px">
+    <button id="exportBtn" class="btn">⬇️ 내보내기</button>
+    <button id="importBtn" class="btn">⬆️ 불러오기</button>
+    <button id="resetBtn" class="btn">↺ 처음 목록으로</button>
+  </div>
+  <input type="file" id="importFile" accept=".json" hidden>
+  <div class="dlg-actions"><button onclick="moreDlg.close()">닫기</button></div>
+</dialog>
+
+<script>
+// apps.json을 못 읽을 때(파일로 직접 열었을 때)만 쓰는 예비 목록
+const EMBEDDED_APPS = [
+  { id:"rp", icon:"🧭", name:"관계대명사 탐험대", cat:"수업 활동", pinned:true,
+    desc:"7과 문법 목적격 관계대명사 모둠 미션. 교사 화면이 방을 열어요.",
+    teacher:"https://relative-pronoun-explorers.vercel.app/#/host",
+    student:"https://relative-pronoun-explorers.vercel.app/" },
+  { id:"idiom", icon:"📖", name:"7과 본문 활동 (관용구 리딩 미션)", cat:"수업 활동", pinned:true,
+    desc:"7과 본문 확인 문장과 관용구 미션. 상·중·하 선택, 반별 이어하기.",
+    teacher:"https://neptess.github.io/donga-2-lesson7-reading-mission/#teacher",
+    student:"https://neptess.github.io/donga-2-lesson7-reading-mission/" },
+  { id:"picker", icon:"🎲", name:"우리반 번호 뽑기", cat:"수업 도구", pinned:true,
+    desc:"중복 없이 번호를 뽑는 수업용 페이지.",
+    teacher:"https://neptess.github.io/number-picker/", student:"" },
+  { id:"journal", icon:"📒", name:"배움 기록장", cat:"학급 운영",
+    desc:"학생 배움 기록, 스티커·생활 체크·간식 보상.",
+    teacher:"https://learning-journal-two.vercel.app/?teacher",
+    student:"https://learning-journal-two.vercel.app/" },
+  { id:"gold", icon:"💰", name:"Gold Quest", cat:"수업 활동",
+    desc:"실시간 퀴즈와 보물상자 게임. 엑셀로 문제 업로드.",
+    teacher:"", student:"", note:"아직 배포 안 됨 (바이브코딩/Gold Quest 폴더에서 npm run dev)" },
+  { id:"dict", icon:"🎧", name:"스마트 영어사전", cat:"수업 도구",
+    desc:"네이버 사전 연동 영어사전.",
+    teacher:"https://neptess.github.io/English-Dictionary/", student:"https://neptess.github.io/English-Dictionary/" },
+  { id:"brick", icon:"🧱", name:"벽돌깨기", cat:"기타",
+    desc:"벽돌깨기 게임.",
+    teacher:"https://neptess.github.io/brick-breaker/", student:"https://neptess.github.io/brick-breaker/" },
+  { id:"open", icon:"🏫", name:"학부모 수업공개의 날", cat:"기타",
+    desc:"세교중학교 학부모 대상 수업공개 안내 페이지.",
+    teacher:"", student:"", note:"GitHub Pages가 꺼져 있음 (segyo-open-class)" },
+];
+
+const KEY = "my-app-hub-v1";
+let DEFAULT_APPS = EMBEDDED_APPS;   // 공식 목록 = apps.json
+let apps = [];
+let filter = "전체";
+let editingId = null;
+
+function load(){
+  try{ const s = localStorage.getItem(KEY); if(s) return JSON.parse(s); }catch(e){}
+  return structuredClone(DEFAULT_APPS);
+}
+const isLocal = () => JSON.stringify(apps) !== JSON.stringify(DEFAULT_APPS);
+function save(){
+  try{
+    if(isLocal()) localStorage.setItem(KEY, JSON.stringify(apps));
+    else localStorage.removeItem(KEY);
+  }catch(e){}
+}
+async function init(){
+  try{
+    const r = await fetch("apps.json", { cache:"no-store" });
+    if(r.ok) DEFAULT_APPS = await r.json();
+  }catch(e){}
+  apps = load(); render();
+}
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function render(){
+  document.getElementById("localNote").hidden = !isLocal();
+  const cats = ["전체", ...new Set(apps.map(a => a.cat || "기타"))];
+  if(!cats.includes(filter)) filter = "전체";
+  document.getElementById("filters").innerHTML = cats.map(c =>
+    `<button class="chip ${c===filter?'on':''}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+  document.getElementById("catList").innerHTML = cats.slice(1).map(c => `<option value="${esc(c)}">`).join("");
+
+  const list = apps.map((a,i)=>({a,i}))
+    .filter(({a}) => filter==="전체" || (a.cat||"기타")===filter)
+    .sort((x,y) => (y.a.pinned?1:0)-(x.a.pinned?1:0) || x.i-y.i);
+
+  document.getElementById("grid").innerHTML = list.map(({a}) => {
+    const same = a.teacher && a.student && a.teacher === a.student;
+    const btns = [];
+    if(a.teacher) btns.push(`<a class="btn primary" href="${esc(a.teacher)}" target="_blank" rel="noopener">${same||!a.student?'열기':'교사용 열기'}</a>`);
+    if(a.student && !same) btns.push(`<a class="btn" href="${esc(a.student)}" target="_blank" rel="noopener">학생용</a>`);
+    if(a.student) btns.push(`<button data-qr="${esc(a.id)}">QR</button>`);
+    return `<article class="card ${a.pinned?'pinned':''}">
+      ${a.pinned?'<span class="pin" title="고정됨">📌</span>':''}
+      <div class="top"><div class="icon">${esc(a.icon||"📱")}</div>
+        <div><p class="name">${esc(a.name)}</p><div class="tag">${esc(a.cat||"기타")}</div></div></div>
+      <p class="desc">${esc(a.desc)}</p>
+      ${a.note?`<span class="status">${esc(a.note)}</span>`:''}
+      <div class="actions">${btns.join("")}</div>
+      <div class="edit-row">
+        <button data-act="up" data-id="${esc(a.id)}" title="앞으로">◀</button>
+        <button data-act="down" data-id="${esc(a.id)}" title="뒤로">▶</button>
+        <button data-act="pin" data-id="${esc(a.id)}">${a.pinned?'고정 해제':'📌 고정'}</button>
+        <button data-act="edit" data-id="${esc(a.id)}">수정</button>
+        <button data-act="del" data-id="${esc(a.id)}">삭제</button>
+      </div>
+    </article>`;
+  }).join("") || `<p class="desc">이 분류에 앱이 없어요.</p>`;
+}
+
+document.getElementById("filters").onclick = e => {
+  const c = e.target.closest("[data-cat]"); if(!c) return;
+  filter = c.dataset.cat; render();
+};
+
+document.getElementById("grid").onclick = e => {
+  const q = e.target.closest("[data-qr]");
+  if(q){ showQR(apps.find(a => a.id===q.dataset.qr)); return; }
+  const b = e.target.closest("[data-act]"); if(!b) return;
+  const i = apps.findIndex(a => a.id===b.dataset.id); const a = apps[i];
+  switch(b.dataset.act){
+    case "up": if(i>0){ [apps[i-1],apps[i]]=[apps[i],apps[i-1]]; } break;
+    case "down": if(i<apps.length-1){ [apps[i+1],apps[i]]=[apps[i],apps[i+1]]; } break;
+    case "pin": a.pinned = !a.pinned; break;
+    case "edit": openForm(a); return;
+    case "del": if(!confirm(`'${a.name}'을(를) 목록에서 지울까요?`)) return; apps.splice(i,1); break;
+  }
+  save(); render();
+};
+
+// 추가/수정
+const appDlg = document.getElementById("appDlg"), appForm = document.getElementById("appForm");
+function openForm(a){
+  editingId = a ? a.id : null;
+  document.getElementById("appDlgTitle").textContent = a ? "앱 수정" : "앱 추가";
+  for(const k of ["icon","name","cat","desc","teacher","student","note"]) appForm.elements[k].value = a?.[k] ?? "";
+  appDlg.showModal();
+}
+document.getElementById("addBtn").onclick = () => openForm(null);
+appDlg.addEventListener("close", () => {
+  if(appDlg.returnValue !== "ok") return;
+  const v = Object.fromEntries(["icon","name","cat","desc","teacher","student","note"].map(k => [k, appForm.elements[k].value.trim()]));
+  if(!v.name) return;
+  if(editingId){ Object.assign(apps.find(a => a.id===editingId), v); }
+  else apps.push({ id: "a"+Date.now().toString(36), pinned:false, ...v });
+  save(); render();
+});
+
+document.getElementById("editBtn").onclick = e => {
+  const on = document.body.classList.toggle("editing");
+  e.currentTarget.textContent = on ? "✅ 편집 끝" : "✏️ 편집";
+};
+
+// QR
+const qrDlg = document.getElementById("qrDlg");
+function showQR(a){
+  document.getElementById("qrTitle").textContent = `${a.icon||""} ${a.name} · 학생 입장`;
+  const box = document.getElementById("qrBox"); box.innerHTML = "";
+  if(window.QRCode) new QRCode(box, { text:a.student, width:280, height:280, correctLevel:QRCode.CorrectLevel.M });
+  else box.textContent = "QR을 불러오지 못했어요 (인터넷 연결 확인)";
+  document.getElementById("qrUrl").textContent = a.student;
+  document.getElementById("copyBtn").onclick = () => navigator.clipboard?.writeText(a.student).then(()=>{
+    document.getElementById("copyBtn").textContent = "복사됨!"; setTimeout(()=>document.getElementById("copyBtn").textContent="주소 복사",1200);
+  });
+  qrDlg.showModal();
+}
+
+// 백업
+const moreDlg = document.getElementById("moreDlg");
+document.getElementById("moreBtn").onclick = () => moreDlg.showModal();
+document.getElementById("exportBtn").onclick = () => {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(apps,null,2)],{type:"application/json"}));
+  const a = Object.assign(document.createElement("a"), { href:url, download:"내-앱-모음-백업.json" });
+  a.click(); URL.revokeObjectURL(url);
+};
+document.getElementById("importBtn").onclick = () => document.getElementById("importFile").click();
+document.getElementById("importFile").onchange = async e => {
+  const f = e.target.files[0]; if(!f) return;
+  try{ const data = JSON.parse(await f.text()); if(!Array.isArray(data)) throw 0; apps = data; save(); render(); moreDlg.close(); }
+  catch{ alert("백업 파일을 읽지 못했어요."); }
+  e.target.value = "";
+};
+document.getElementById("resetBtn").onclick = () => {
+  if(!confirm("편집한 내용을 지우고 처음 목록으로 되돌릴까요?")) return;
+  apps = structuredClone(DEFAULT_APPS); save(); render(); moreDlg.close();
+};
+
+document.getElementById("today").textContent =
+  new Date().toLocaleDateString("ko-KR",{year:"numeric",month:"long",day:"numeric",weekday:"long"});
+document.getElementById("toOfficial").onclick = () => {
+  if(!confirm("이 브라우저에서 고친 내용을 지우고 공식 목록(apps.json)으로 볼까요?")) return;
+  apps = structuredClone(DEFAULT_APPS); save(); render();
+};
+init();
+</script>
+</body>
+</html>

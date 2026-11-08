@@ -1,0 +1,51 @@
+[
+  {
+    "id": "rp",
+    "icon": "🧭",
+    "name": "관계대명사 탐험대",
+    "cat": "수업 활동",
+    "pinned": true,
+    "desc": "7과 문법 목적격 관계대명사 모둠 미션. 교사 화면이 방을 열어요.",
+    "teacher": "https://relative-pronoun-explorers.vercel.app/#/host",
+    "student": "https://relative-pronoun-explorers.vercel.app/"
+  },
+  {
+    "id": "idiom",
+    "icon": "📖",
+    "name": "7과 본문 활동 (관용구 리딩 미션)",
+    "cat": "수업 활동",
+    "pinned": true,
+    "desc": "7과 본문 확인 문장과 관용구 미션. 상·중·하 선택, 반별 이어하기.",
+    "teacher": "https://neptess.github.io/donga-2-lesson7-reading-mission/#teacher",
+    "student": "https://neptess.github.io/donga-2-lesson7-reading-mission/"
+  },
+  {
+    "id": "picker",
+    "icon": "🎲",
+    "name": "우리반 번호 뽑기",
+    "cat": "수업 도구",
+    "pinned": true,
+    "desc": "중복 없이 번호를 뽑는 수업용 페이지.",
+    "teacher": "https://neptess.github.io/number-picker/",
+    "student": ""
+  },
+  {
+    "id": "journal",
+    "icon": "📒",
+    "name": "배움 기록장",
+    "cat": "학급 운영",
+    "desc": "학생 배움 기록, 스티커·생활 체크·간식 보상.",
+    "teacher": "https://learning-journal-two.vercel.app/?teacher",
+    "student": "https://learning-journal-two.vercel.app/"
+  },
+  {
+    "id": "gold",
+    "icon": "💰",
+    "name": "Gold Quest",
+    "cat": "수업 활동",
+    "desc": "실시간 퀴즈와 보물상자 게임. 엑셀로 문제 업로드.",
+    "teacher": "",
+    "student": "",
+    "note": "아직 배포 안 됨 (바이브코딩/Gold Quest 폴더에서 npm run dev)"
+  }
+]
